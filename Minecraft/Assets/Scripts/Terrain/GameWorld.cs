@@ -36,21 +36,41 @@ namespace Assets.Scripts.Terrain
                 }
             }
         }
-        public void Update()
+        private void Update()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
             {
+                bool isDestroying = Input.GetMouseButtonDown(0);
+
                 Ray ray = mainCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
 
                 if (Physics.Raycast(ray, out var hitInfo))
                 {
-                    Vector3 blockCenter = hitInfo.point + hitInfo.normal * ChunkRenderer.BlockScale / 2;
+                    Vector3 blockCenter;
+
+                    if (isDestroying)
+                    {
+                        blockCenter = hitInfo.point - hitInfo.normal * ChunkRenderer.BlockScale / 2;
+                    }
+                    else
+                    {
+                        blockCenter = hitInfo.point + hitInfo.normal * ChunkRenderer.BlockScale / 2;
+                    }
+
                     Vector3Int blockWorldPos = Vector3Int.FloorToInt(blockCenter / ChunkRenderer.BlockScale);
                     Vector2Int chunkPos = GetChungContainingBlock(blockWorldPos); 
                     if (ChunkDatas.TryGetValue(chunkPos, out ChunkData chunkData))
                     {
                         Vector3Int chunkOrigin = new Vector3Int(chunkPos.x, 0, chunkPos.y) * ChunkRenderer.ChunkWeight;
-                        chunkData.Renderer.SpawnBlock(blockWorldPos - chunkOrigin);
+                        if (isDestroying)
+                        {
+                            chunkData.Renderer.DestroyBlock(blockWorldPos - chunkOrigin);
+                        }
+                        else
+                        {
+                            chunkData.Renderer.SpawnBlock(blockWorldPos - chunkOrigin);
+                        }
+                        
                     }
                 }
             }

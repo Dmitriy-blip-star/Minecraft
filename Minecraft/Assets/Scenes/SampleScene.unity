@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 439083833}
   - component: {fileID: 439083832}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Crosshair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -677,7 +677,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6012157122307103146, guid: a0b40c3aa366d4c44aa3de3ed47b59cc, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 14.74
+      value: 35
       objectReference: {fileID: 0}
     - target: {fileID: 6012157122307103146, guid: a0b40c3aa366d4c44aa3de3ed47b59cc, type: 3}
       propertyPath: m_LocalPosition.z
@@ -725,7 +725,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6012157122307103152, guid: a0b40c3aa366d4c44aa3de3ed47b59cc, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6012157122307103153, guid: a0b40c3aa366d4c44aa3de3ed47b59cc, type: 3}
+      propertyPath: speed
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 6012157122307103153, guid: a0b40c3aa366d4c44aa3de3ed47b59cc, type: 3}
+      propertyPath: jumpHeight
+      value: 0.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a0b40c3aa366d4c44aa3de3ed47b59cc, type: 3}
