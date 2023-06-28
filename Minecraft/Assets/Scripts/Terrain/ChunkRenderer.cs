@@ -7,17 +7,18 @@ using UnityEngine;
 
 public class ChunkRenderer : MonoBehaviour
 {
-    public const int ChunkWeight = 25;
+    public const int ChunkWeight = 32;
     public const int ChunkHeight = 128;
-    public const float BlockScale = .25f;
+    public const float BlockScale = .125f;
 
     public ChunkData ChunkData;
     public GameWorld ParentWorld;
 
     private Mesh chunkMesh;
 
-    private List<Vector3> verticies = new List<Vector3>(); // массив вершин
-    private List<int> triangles = new List<int>(); // массив треугольников
+    private List<Vector3> verticies = new List<Vector3>();
+    private List<Vector2> uvs = new List<Vector2>();
+    private List<int> triangles = new List<int>();
 
     private void Start()
     {
@@ -29,7 +30,7 @@ public class ChunkRenderer : MonoBehaviour
 
     public void SpawnBlock(Vector3Int blockPosition)
     {
-        ChunkData.Bloks[blockPosition.x, blockPosition.y, blockPosition.z] = BlockType.Grass;
+        ChunkData.Bloks[blockPosition.x, blockPosition.y, blockPosition.z] = BlockType.Wood;
         RegenerateMesh();
     }
     public void DestroyBlock(Vector3Int blockPosition)
@@ -41,6 +42,7 @@ public class ChunkRenderer : MonoBehaviour
     private void RegenerateMesh()
     {
         verticies.Clear();
+        uvs.Clear();
         triangles.Clear();
 
         for (int y = 0; y < ChunkHeight; y++)
@@ -56,6 +58,7 @@ public class ChunkRenderer : MonoBehaviour
 
         chunkMesh.triangles = Array.Empty<int>();
         chunkMesh.vertices = verticies.ToArray();
+        chunkMesh.uv= uvs.ToArray();
         chunkMesh.triangles = triangles.ToArray();
 
         chunkMesh.Optimize();
@@ -70,14 +73,42 @@ public class ChunkRenderer : MonoBehaviour
     {
         var blockPosition = new Vector3Int(x, y, z);
 
-        if (GetBlockAtPosition(blockPosition) == 0) return;
+        BlockType blockType = GetBlockAtPosition(blockPosition);
 
-        if(GetBlockAtPosition(blockPosition + Vector3Int.left) == 0) GenerateRightSide(blockPosition);
-        if (GetBlockAtPosition(blockPosition + Vector3Int.right) == 0) GenerateLeftSide(blockPosition);
-        if (GetBlockAtPosition(blockPosition + Vector3Int.forward) == 0) GenerateFrontSide(blockPosition);
-        if (GetBlockAtPosition(blockPosition + Vector3Int.back) == 0) GenerateBackSide(blockPosition);
-        if (GetBlockAtPosition(blockPosition + Vector3Int.down) == 0) GenerateBottomSide(blockPosition);
-        if (GetBlockAtPosition(blockPosition + Vector3Int.up) == 0) GenerateTopSide(blockPosition);
+        if (blockType == BlockType.Air) return;
+
+
+
+        if(GetBlockAtPosition(blockPosition + Vector3Int.left) == 0)
+        {
+            GenerateRightSide(blockPosition);
+            AddUvs(blockType, Vector2Int.right);
+        }
+        if (GetBlockAtPosition(blockPosition + Vector3Int.right) == 0)
+        {
+            GenerateLeftSide(blockPosition);
+            AddUvs(blockType, Vector2Int.left);
+        }
+        if (GetBlockAtPosition(blockPosition + Vector3Int.forward) == 0)
+        {
+            GenerateFrontSide(blockPosition);
+            AddUvs(blockType, Vector2Int.zero);
+        }
+        if (GetBlockAtPosition(blockPosition + Vector3Int.back) == 0)
+        {
+            GenerateBackSide(blockPosition);
+            AddUvs(blockType, Vector2Int.zero);
+        }
+        if (GetBlockAtPosition(blockPosition + Vector3Int.down) == 0)
+        {
+            GenerateBottomSide(blockPosition);
+            AddUvs(blockType, Vector2Int.down);
+        }
+        if (GetBlockAtPosition(blockPosition + Vector3Int.up) == 0)
+        {
+            GenerateTopSide(blockPosition);
+            AddUvs(blockType, Vector2Int.up);
+        }
 
     }
 
@@ -195,5 +226,41 @@ public class ChunkRenderer : MonoBehaviour
         triangles.Add(verticies.Count - 3);
         triangles.Add(verticies.Count - 1);
         triangles.Add(verticies.Count - 2);
+    }
+
+    private void AddUvs(BlockType blockType, Vector2Int normal)
+    {
+        Vector2 uv;
+
+        Vector2 grass = new Vector2(32f / 256, 96f / 256);
+        Vector2 dirty = new Vector2(32f / 256, 240f / 256);
+        Vector2 side = new Vector2(48f / 256, 240f / 256);
+
+        if (blockType == BlockType.Grass)
+        {
+            uv = normal == Vector2Int.up ? grass :
+                normal == Vector2Int.down ? dirty :
+                side;
+        }
+
+        else if (blockType == BlockType.Stone)
+        {
+            uv = new Vector2(16f / 256, 240f / 256);
+        }
+
+        else if (blockType == BlockType.Wood)
+        {
+            uv = new Vector2(64f / 256, 240f / 256);
+        }
+
+        else
+        {
+            uv = new Vector2(160f / 256, 224f / 256);
+        }
+
+        for (int i = 0; i < 4; i++)
+        {
+            uvs.Add(uv);
+        }
     }
 }
